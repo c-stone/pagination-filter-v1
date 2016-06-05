@@ -99,9 +99,10 @@ body{
   margin: 40px 0 0 0;
   text-align: center;
 }
- 
+
   .pagination li{
     display: inline;
+    padding: 0px 2px;
   }
 
     .pagination li a{
