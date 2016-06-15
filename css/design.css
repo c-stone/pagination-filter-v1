@@ -31,6 +31,7 @@ body{
       border-radius: 5px;
       border: 1px solid #eaeaea;
       padding: 8px 15px;
+      margin: 0 4px;
       font-size: 14px;
     }
 
@@ -102,7 +103,7 @@ body{
 
   .pagination li{
     display: inline;
-    padding: 0px 2px;
+    padding: 0 2px;
   }
 
     .pagination li a{
