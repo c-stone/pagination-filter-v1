@@ -11,98 +11,50 @@ var studentItems = $(".student-item"),
     studentEmails = $(".email"),
     studentNames = $(".name"),
     studentInfo = $.makeArray(studentEmails.add(studentNames)),
-    pageCount = Math.ceil(studentItems.length / 10),
-    pagesObject = [];
+    pageCount = Math.ceil(studentItems.length / 10);
 
-    console.log(studentItems[0]);
-
-/// test
-function searchBoxEventListener() {
-  $("#search").click(function() {
-    $(".student-item").remove();
-  });
-
-  $("#search").keyup(function() {
-    var searchFilter = $(this).val();
-    $.each(studentNames, function(i, element) {
-      var elementText = element.textContent;
-
-      if ( elementText.search(new RegExp(searchFilter, "i") ) < 0) {
-        //should reverse this
-      } else {
-        console.log(studentItems[0]);
-        $(".student-list").append(studentItems[i]);
-
-      }
-
-    });
-  });
-}
-/// end test
-
-//// Pagination
-function groupStudentsBy10s(studentItems) {
-  var students = studentItems;
-  pagesObject.push(students.splice(0, 10));
+function groupListIntoPages(list) {
+  var pagesArray = [];
+  do {
+    for (; list.length > 0;) {
+      pagesArray.push(list.splice(0, 10));
+    }
+  } while (studentItems.lenth > 0);
+  return pagesArray;
 }
 
-function showPageByNumber(i) { //show page corresponding to number supplied
+function showPageByNumber(pageNumber, paginatedList) {
   $(".student-item").remove();
-  $(".student-list").append(pagesObject[i])
+  $(".student-list").append(paginatedList[pageNumber])
                     .css("display", "none")
                     .fadeIn('fast'); // animation from page to page
 }
 
-function appendPageButtons(object) {
+function renderPageButtons(paginatedList) {
+  //render buttons
+  var numberOfPages = paginatedList.length;
   var paginationDiv = '<div class="pagination">'+
                         '<ul></ul>'+
                       '</div>';
   $(".student-list").after(paginationDiv); //add paginationDiv to the page
-  for (var i = 1; i <= object.length; i++) { //add page buttons
+  for (var i = 1; i <= numberOfPages; i++) { //add page buttons
     var pageButton = '<li><a href="#">'+ i +'</a></li>';
     $('.pagination ul').append(pageButton);
   }
   $(".pagination ul li a").first().addClass("active"); //make 1st button active
-}
-
-function pageButtonsClickListener() { //change page when button clicked
+  //Add click listeners
   $(".pagination ul li a").on("click", function(e) {
-    var pageNumber = parseInt($(this)[0].text) - 1;
-    showPageByNumber(pageNumber);
+    var pageSelection = parseInt($(this)[0].text) - 1;
+    showPageByNumber(pageSelection, paginatedList);
     $(".pagination ul li a").removeClass();
     $(this).addClass("active");
     e.preventDefault();
   });
 }
 
-function appendSeachBox() {
-  var searchDiv = '<div class="student-search">'+
-                    '<input id="search" placeholder="Search for students...">'+
-                    '<button>Search</button>'+
-                  '</div>';
-  $(".page-header h2").after(searchDiv);
-}
+var paginatedStudentList = groupListIntoPages(studentItems);
+renderPageButtons(paginatedStudentList);
+showPageByNumber(0, paginatedStudentList);
 
-// function searchBoxEventListener() {
-//   var searchBox = $(".student-search input");
-//   $(searchBox).keyup(function() {
-//     console.log(studentEmails.filter(searchFilter));
-//     // pageObject = studentsInfo.filter(searchFilter);
-//   });
-// }
 
-////Begin
-do { //populate pagesObject with students divided into 10s
-  for (; studentItems.length > 0;) {
-    groupStudentsBy10s(studentItems); //pagesObject created
-  }
-} while (studentItems.lenth > 0);
-
-if (pagesObject.length > 1) {
-  appendPageButtons(pagesObject); //page buttons added based on number of pages
-  pageButtonsClickListener();
-  showPageByNumber(0); //show first page to start
-}
-
-appendSeachBox();
-searchBoxEventListener();
+//use $.filter for search
