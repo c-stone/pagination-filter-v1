@@ -9,16 +9,41 @@
 //// Global Variables
 var studentItems = $(".student-item"),
     studentEmails = $(".email"),
-    studentEmailsArray = $.makeArray(studentEmails),
-    studentNames = $.makeArray($(".name").contents().get()),
+    studentNames = $(".name"),
+    studentInfo = $.makeArray(studentEmails.add(studentNames)),
     pageCount = Math.ceil(studentItems.length / 10),
     pagesObject = [];
-    console.log(studentEmailsArray[2]);
-    console.log(studentItems);
+
+    console.log(studentItems[0]);
+
+/// test
+function searchBoxEventListener() {
+  $("#search").click(function() {
+    $(".student-item").remove();
+  });
+
+  $("#search").keyup(function() {
+    var searchFilter = $(this).val();
+    $.each(studentNames, function(i, element) {
+      var elementText = element.textContent;
+
+      if ( elementText.search(new RegExp(searchFilter, "i") ) < 0) {
+        //should reverse this
+      } else {
+        console.log(studentItems[0]);
+        $(".student-list").append(studentItems[i]);
+
+      }
+
+    });
+  });
+}
+/// end test
 
 //// Pagination
 function groupStudentsBy10s(studentItems) {
-  pagesObject.push(studentItems.splice(0, 10));
+  var students = studentItems;
+  pagesObject.push(students.splice(0, 10));
 }
 
 function showPageByNumber(i) { //show page corresponding to number supplied
@@ -50,24 +75,6 @@ function pageButtonsClickListener() { //change page when button clicked
   });
 }
 
-//// Search
-function search() {
-  $("#search").keyup(function() {
-    var searchFilter = $(this).val();
-    $(".student-item").remove();
-    $("student-list").append(studentItems);
-
-    studentEmails.each(function() {
-        if ( $(this).text().search(new RegExp(searchFilter, "i") ) < 0) {
-          $(this).fadeOut();
-        } else {
-          $(this).show();
-        }
-    });
-
-  });
-}
-
 function appendSeachBox() {
   var searchDiv = '<div class="student-search">'+
                     '<input id="search" placeholder="Search for students...">'+
@@ -76,13 +83,13 @@ function appendSeachBox() {
   $(".page-header h2").after(searchDiv);
 }
 
-function searchBoxEventListener() {
-  var searchBox = $(".student-search input");
-  $(searchBox).keyup(function() {
-    console.log(studentEmails.filter(searchFilter));
-    // pageObject = studentsInfo.filter(searchFilter);
-  });
-}
+// function searchBoxEventListener() {
+//   var searchBox = $(".student-search input");
+//   $(searchBox).keyup(function() {
+//     console.log(studentEmails.filter(searchFilter));
+//     // pageObject = studentsInfo.filter(searchFilter);
+//   });
+// }
 
 ////Begin
 do { //populate pagesObject with students divided into 10s
