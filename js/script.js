@@ -9,25 +9,28 @@
 //// Global Variables
 var studentItems = $(".student-item"),
     studentEmails = $(".email"),
-    studentNames = $(".name"),
-    studentInfo = $.makeArray(studentEmails.add(studentNames)),
-    pageCount = Math.ceil(studentItems.length / 10);
+    studentNames = $(".name");
 
+//// Functions
 function groupListIntoPages(list) {
   var pagesArray = [];
   do {
     for (; list.length > 0;) {
       pagesArray.push(list.splice(0, 10));
     }
-  } while (studentItems.lenth > 0);
+  } while (list.lenth > 0);
   return pagesArray;
 }
 
-function showPageByNumber(pageNumber, paginatedList) {
-  $(".student-item").remove();
-  $(".student-list").append(paginatedList[pageNumber])
-                    .css("display", "none")
-                    .fadeIn('fast'); // animation from page to page
+function renderPaginatedStudentList(pageNumber, paginatedPageList) {
+  $(".student-list li").hide();
+  $.each(paginatedPageList, function(index, page){
+      if (pageNumber === index) {
+        $.each(page, function(i, listItem){
+          $(listItem).fadeIn('fast');
+        });
+      }
+  });
 }
 
 function renderPageButtons(paginatedList) {
@@ -42,19 +45,48 @@ function renderPageButtons(paginatedList) {
     $('.pagination ul').append(pageButton);
   }
   $(".pagination ul li a").first().addClass("active"); //make 1st button active
+
   //Add click listeners
   $(".pagination ul li a").on("click", function(e) {
     var pageSelection = parseInt($(this)[0].text) - 1;
-    showPageByNumber(pageSelection, paginatedList);
+    renderPaginatedStudentList(pageSelection, paginatedList);
     $(".pagination ul li a").removeClass();
     $(this).addClass("active");
     e.preventDefault();
   });
 }
 
+function listFilter(list, filter) {
+  var filteredList = [];
+  return list.filter(function(index) {
+    var searchQuery = this.textContent;
+    return searchQuery.search(new RegExp(filter, "i")) !== -1;
+  });
+}
+
+function renderSearchBox() {
+  var searchDiv = '<div class="student-search">'+
+                  '<input id="search" placeholder="Search for students...">'+
+                  '<button>Search</button>'+
+                '</div>';
+  $(".page-header h2").after(searchDiv);
+  //Add keyup listeners
+  $("#search").keyup(function() {
+    var searchTerm = $(this).val();
+    var filteredList = listFilter(studentNames, searchTerm);
+    var paginatedFilteredList = groupListIntoPages(filteredList);
+    console.log(paginatedFilteredList);
+    // renderPageButtons(paginatedFilteredList);
+    renderPaginatedStudentList(0, $(paginatedFilteredList));
+  });
+}
+
+//Begin
 var paginatedStudentList = groupListIntoPages(studentItems);
+console.log(paginatedStudentList);
 renderPageButtons(paginatedStudentList);
-showPageByNumber(0, paginatedStudentList);
+renderPaginatedStudentList(0, paginatedStudentList);
+renderSearchBox();
 
 
 //use $.filter for search
